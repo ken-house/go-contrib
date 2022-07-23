@@ -1,4 +1,4 @@
-module github.com/go-contrib
+module github.com/ken-house/go-contrib
 
 go 1.18
 
