@@ -1,4 +1,4 @@
-package mysql
+package mysqlClient
 
 import (
 	"time"
@@ -47,7 +47,7 @@ type SingleConfig struct {
 }
 
 func newEngine(cfg SingleConfig) (*xorm.Engine, error) {
-	engine, err := xorm.NewEngine("mysql", cfg.Dsn)
+	engine, err := xorm.NewEngine("mysqlClient", cfg.Dsn)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

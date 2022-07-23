@@ -1,4 +1,4 @@
-package mysql
+package mysqlClient
 
 import (
 	"time"
@@ -67,7 +67,7 @@ type GroupConfig struct {
 }
 
 func newEngineGroup(cfg GroupConfig) (*xorm.EngineGroup, error) {
-	masterEngine, err := xorm.NewEngine("mysql", cfg.Master.Dsn)
+	masterEngine, err := xorm.NewEngine("mysqlClient", cfg.Master.Dsn)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -79,7 +79,7 @@ func newEngineGroup(cfg GroupConfig) (*xorm.EngineGroup, error) {
 	}
 	var slaveEngines []*xorm.Engine
 	for _, slave := range cfg.Slaves {
-		slaveEngine, err := xorm.NewEngine("mysql", slave.Dsn)
+		slaveEngine, err := xorm.NewEngine("mysqlClient", slave.Dsn)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
