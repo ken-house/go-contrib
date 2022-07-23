@@ -47,7 +47,7 @@ type SingleConfig struct {
 }
 
 func newEngine(cfg SingleConfig) (*xorm.Engine, error) {
-	engine, err := xorm.NewEngine("mysqlClient", cfg.Dsn)
+	engine, err := xorm.NewEngine("mysql", cfg.Dsn)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
