@@ -29,13 +29,15 @@ func NewGroupClient(cfg GroupConfig) (GroupClient, func(), error) {
 
 type GroupConfig struct {
 	Addrs    []string `json:"addrs" mapstructure:"addrs"`
-	Password string
+	Password string   `json:"password" mapstructure:"password"`
+	PoolSize int      `json:"pool_size" mapstructure:"pool_size"`
 }
 
 func NewRedisGroupClient(cfg GroupConfig) (redis.UniversalClient, error) {
 	client := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:    cfg.Addrs,
 		Password: cfg.Password,
+		PoolSize: cfg.PoolSize,
 	})
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {

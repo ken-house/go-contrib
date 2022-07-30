@@ -31,6 +31,7 @@ type SingleConfig struct {
 	Addr     string `json:"addr" mapstructure:"addr"`
 	Password string `json:"password" mapstructure:"password"`
 	DB       int    `json:"db" mapstructure:"db"`
+	PoolSize int    `json:"pool_size" mapstructure:"pool_size"`
 }
 
 func NewClient(cfg SingleConfig) (*redis.Client, error) {
@@ -38,6 +39,7 @@ func NewClient(cfg SingleConfig) (*redis.Client, error) {
 		Addr:     cfg.Addr,
 		Password: cfg.Password,
 		DB:       cfg.DB,
+		PoolSize: cfg.PoolSize,
 	})
 	_, err := client.Ping(context.Background()).Result()
 	if err != nil {
