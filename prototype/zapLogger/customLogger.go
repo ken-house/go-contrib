@@ -1,12 +1,14 @@
 package zapLogger
 
 import (
+	"log"
+
+	"github.com/ken-house/go-contrib/utils/tools"
+
 	"github.com/ken-house/go-contrib/utils/env"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
-	"os"
 )
 
 // CustomLogger 自定义zap日志，支持日志切割归档
@@ -42,11 +44,11 @@ func getWriteSyncer(lumberjackLogger *lumberjack.Logger, outPutFile string) zapc
 	if lumberjackLogger != nil {
 		return zapcore.AddSync(lumberjackLogger)
 	} else {
-		// todo 确保目录存在，不存在则创建目录
+		// 确保目录存在，不存在则创建目录
 		if outPutFile == "" {
 			outPutFile = "./log/test.log"
 		}
-		file, err := os.Create(outPutFile)
+		file, err := tools.FileNotExistAndCreate(outPutFile)
 		if err != nil {
 			log.Fatalln(err)
 		}

@@ -3,6 +3,8 @@ package tools
 import (
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -56,4 +58,20 @@ func GetOutBoundIp() string {
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String()
+}
+
+// FileNotExistAndCreate 判断文件是否存在，不存在则创建
+func FileNotExistAndCreate(filePath string) (f *os.File, err error) {
+	dirPath := filepath.Dir(filePath)
+	_, err = os.Stat(dirPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = os.MkdirAll(dirPath, 0755)
+			if err != nil {
+				return nil, err
+			}
+			return os.Create(filePath)
+		}
+	}
+	return os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 }

@@ -1,10 +1,13 @@
 package zapLogger
 
 import (
+	"log"
+
+	"github.com/ken-house/go-contrib/utils/tools"
+
 	"github.com/ken-house/go-contrib/utils/env"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
 )
 
 // SimpleLogger 使用zap包自带的配置文件
@@ -14,10 +17,16 @@ func SimpleLogger(outPutPaths []string) {
 
 	config := zap.NewProductionConfig()
 
-	// 增加自定义日志记录位置 // todo 确保目录存在，不存在则创建目录
+	// 增加自定义日志记录位置
 	if len(outPutPaths) > 0 {
 		outPutPathsArr := config.OutputPaths
-		outPutPathsArr = append(outPutPathsArr, outPutPaths...)
+		for _, filePath := range outPutPaths {
+			_, err = tools.FileNotExistAndCreate(filePath)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			outPutPathsArr = append(outPutPathsArr, filePath)
+		}
 
 		config.OutputPaths = outPutPathsArr
 		config.ErrorOutputPaths = outPutPathsArr
