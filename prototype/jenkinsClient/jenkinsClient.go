@@ -3,16 +3,14 @@ package jenkinsClient
 import (
 	"context"
 	"github.com/bndr/gojenkins"
-	"github.com/pkg/errors"
 )
 
 type JenkinsClient interface {
-	GetQueueTaskIdList() (taskIdList []int64, err error)
+	GetQueue(ctx context.Context) (*gojenkins.Queue, error)
 }
 
 type jenkinsClient struct {
-	Ctx    context.Context
-	Client *gojenkins.Jenkins
+	*gojenkins.Jenkins
 }
 
 // JenkinsConfig Jenkins连接配置
@@ -29,24 +27,6 @@ func NewJenkinsClient(cfg JenkinsConfig) (JenkinsClient, error) {
 		return nil, err
 	}
 	return &jenkinsClient{
-		Ctx:    ctx,
-		Client: client,
+		Jenkins: client,
 	}, nil
-}
-
-// GetQueueTaskIdList 获取队列中的任务ID
-func (cli *jenkinsClient) GetQueueTaskIdList() (taskIdList []int64, err error) {
-	taskIdList = make([]int64, 0, 100)
-	queueList, err := cli.Client.GetQueue(cli.Ctx)
-	if err != nil {
-		return taskIdList, err
-	}
-	if len(queueList.Raw.Items) == 0 {
-		return taskIdList, errors.New("queue empty")
-	}
-
-	for _, v := range queueList.Raw.Items {
-		taskIdList = append(taskIdList, v.ID)
-	}
-	return taskIdList, nil
 }
