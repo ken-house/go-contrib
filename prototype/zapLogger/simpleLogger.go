@@ -16,6 +16,7 @@ func SimpleLogger(outPutPaths []string) {
 	var err error
 
 	config := zap.NewProductionConfig()
+	config.Encoding = "console"
 
 	// 增加自定义日志记录位置
 	if len(outPutPaths) > 0 {
