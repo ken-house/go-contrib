@@ -1,7 +1,9 @@
 package zapLogger
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/ken-house/go-contrib/utils/tools"
 
@@ -46,7 +48,7 @@ func getWriteSyncer(lumberjackLogger *lumberjack.Logger, outPutFile string) zapc
 	} else {
 		// 确保目录存在，不存在则创建目录
 		if outPutFile == "" {
-			outPutFile = "./log/test.log"
+			outPutFile = fmt.Sprintf("./logs/log_%s.log", time.Now().Format("20060102"))
 		}
 		file, err := tools.FileNotExistAndCreate(outPutFile)
 		if err != nil {
