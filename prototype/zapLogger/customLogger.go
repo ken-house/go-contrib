@@ -15,9 +15,9 @@ import (
 )
 
 // CustomLogger 自定义zap日志，支持日志切割归档
-func CustomLogger(lumberjackLogger lumberjack.Logger, outPutFile string) {
+func CustomLogger(lumberjackLogger *lumberjack.Logger, outPutFile string) {
 	encoder := getEncoder()
-	writeSyncer := getWriteSyncer(&lumberjackLogger, outPutFile)
+	writeSyncer := getWriteSyncer(lumberjackLogger, outPutFile)
 
 	logLevel := zapcore.DebugLevel
 	if env.IsReleasing() {
@@ -36,7 +36,7 @@ func CustomLogger(lumberjackLogger lumberjack.Logger, outPutFile string) {
 
 // 获取编码器
 func getEncoder() zapcore.Encoder {
-	encoderConfig := zap.NewDevelopmentEncoderConfig()
+	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	return zapcore.NewConsoleEncoder(encoderConfig)
