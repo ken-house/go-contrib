@@ -73,5 +73,5 @@ func FileNotExistAndCreate(filePath string) (f *os.File, err error) {
 			return os.Create(filePath)
 		}
 	}
-	return os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	return os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 }
