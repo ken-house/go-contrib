@@ -3,6 +3,7 @@ package zapLogger
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/ken-house/go-contrib/utils/tools"
@@ -43,9 +44,9 @@ func getEncoder() zapcore.Encoder {
 
 // 日志写入目标，使用lumberjack进行日志切割
 func getWriteSyncer(lumberjackLogger *lumberjack.Logger, outPutFile string) zapcore.WriteSyncer {
-	if lumberjackLogger != nil {
-		return zapcore.AddSync(lumberjackLogger)
-	} else {
+	if lumberjackLogger != nil { // 使用lumberjack进行日志切割
+		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(lumberjackLogger))
+	} else { // 不使用切割
 		// 确保目录存在，不存在则创建目录
 		if outPutFile == "" {
 			outPutFile = fmt.Sprintf("./logs/log_%s.log", time.Now().Format("20060102"))
