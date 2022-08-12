@@ -24,7 +24,7 @@ func CustomLogger(lumberjackLogger *lumberjack.Logger, outPutFile string) {
 		logLevel = zapcore.InfoLevel
 	}
 	core := zapcore.NewCore(encoder, writeSyncer, logLevel)
-	logger := zap.New(core, zap.AddCaller())
+	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(logLevel))
 
 	defer logger.Sync()
 
@@ -55,6 +55,6 @@ func getWriteSyncer(lumberjackLogger *lumberjack.Logger, outPutFile string) zapc
 		if err != nil {
 			log.Fatalln(err)
 		}
-		return zapcore.AddSync(file)
+		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(file))
 	}
 }
