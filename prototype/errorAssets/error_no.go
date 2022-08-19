@@ -1,5 +1,7 @@
 package errorAssets
 
+import "strconv"
+
 type Level int
 
 // 提示错误显示效果
@@ -11,6 +13,7 @@ const (
 type ErrorNo interface {
 	GetTitle() string
 	GetCode() int
+	GetCodeStr() string
 	ToastError() errorNo
 	PopupError(popupTitle, popupContent string, popupStyle int) errorNo
 }
@@ -43,6 +46,10 @@ func (err *errorNo) GetTitle() string {
 
 func (err *errorNo) GetCode() int {
 	return err.Error.Code
+}
+
+func (err *errorNo) GetCodeStr() string {
+	return strconv.Itoa(err.Error.Code)
 }
 
 // ToastError toast提示返回结构
