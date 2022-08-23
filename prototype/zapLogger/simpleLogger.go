@@ -11,7 +11,7 @@ import (
 )
 
 // SimpleLogger 使用zap包自带的配置文件
-func SimpleLogger(outPutPaths []string) {
+func SimpleLogger(outPutPaths []string, extraFieldMap map[string]string) {
 	var logger *zap.Logger
 	var err error
 
@@ -39,14 +39,27 @@ func SimpleLogger(outPutPaths []string) {
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	config.EncoderConfig = encoderConfig
 
+	// 可选项
+	optionList := make([]zap.Option, 0, 10)
+	// 预设字段
+	if len(extraFieldMap) > 0 {
+		fieldList := make([]zap.Field, 0, 10)
+		for k, v := range extraFieldMap {
+			field := zap.String(k, v)
+			fieldList = append(fieldList, field)
+		}
+		fieldOption := zap.Fields(fieldList...)
+		optionList = append(optionList, fieldOption)
+	}
+
 	// 保证生产环境和其他环境日志存储格式一致，仅日志等级不同
 	if env.IsReleasing() {
-		logger, err = config.Build()
+		logger, err = config.Build(optionList...)
 	} else {
 		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
 		config.Development = true
 
-		logger, err = config.Build()
+		logger, err = config.Build(optionList...)
 	}
 	if err != nil {
 		log.Fatalln(err)
