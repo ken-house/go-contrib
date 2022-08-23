@@ -15,7 +15,7 @@ import (
 )
 
 // CustomLogger 自定义zap日志，支持日志切割归档
-func CustomLogger(lumberjackLogger *lumberjack.Logger, outPutFile string) {
+func CustomLogger(lumberjackLogger *lumberjack.Logger, outPutFile string, extraField map[string]string) {
 	encoder := getEncoder()
 	writeSyncer := getWriteSyncer(lumberjackLogger, outPutFile)
 
@@ -24,7 +24,22 @@ func CustomLogger(lumberjackLogger *lumberjack.Logger, outPutFile string) {
 		logLevel = zapcore.InfoLevel
 	}
 	core := zapcore.NewCore(encoder, writeSyncer, logLevel)
-	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(logLevel))
+
+	// 可选项
+	optionList := make([]zap.Option, 0, 10)
+	optionList = append(optionList, zap.AddCaller(), zap.AddStacktrace(logLevel))
+	// 预设字段
+	if len(extraField) > 0 {
+		fieldList := make([]zap.Field, 0, 10)
+		for k, v := range extraField {
+			field := zap.String(k, v)
+			fieldList = append(fieldList, field)
+		}
+		fieldOption := zap.Fields(fieldList...)
+		optionList = append(optionList, fieldOption)
+	}
+
+	logger := zap.New(core, optionList...)
 
 	defer logger.Sync()
 
