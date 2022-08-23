@@ -39,9 +39,12 @@ func SimpleLogger(outputPaths []string, extraFieldMap map[string]string) {
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	config.EncoderConfig = encoderConfig
 
-	logLevel := zapcore.DebugLevel
-	if env.IsReleasing() {
-		logLevel = zapcore.InfoLevel
+	// 保证生产环境和其他环境日志存储格式一致，仅日志等级不同
+	logLevel := zapcore.InfoLevel
+	if !env.IsReleasing() {
+		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+		config.Development = true
+		logLevel = zapcore.DebugLevel
 	}
 
 	// 可选项
@@ -58,15 +61,8 @@ func SimpleLogger(outputPaths []string, extraFieldMap map[string]string) {
 		optionList = append(optionList, fieldOption)
 	}
 
-	// 保证生产环境和其他环境日志存储格式一致，仅日志等级不同
-	if env.IsReleasing() {
-		logger, err = config.Build(optionList...)
-	} else {
-		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-		config.Development = true
+	logger, err = config.Build(optionList...)
 
-		logger, err = config.Build(optionList...)
-	}
 	if err != nil {
 		log.Fatalln(err)
 	}
