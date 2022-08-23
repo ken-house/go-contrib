@@ -8,33 +8,33 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type SingleClient interface {
+type RedisClient interface {
 	redis.UniversalClient
 }
 
-type singleClient struct {
+type redisClient struct {
 	redis.UniversalClient
 }
 
-func NewSingleClient(cfg SingleConfig) (SingleClient, func(), error) {
-	client, err := NewClient(cfg)
+func NewClient(cfg RedisConfig) (RedisClient, func(), error) {
+	client, err := NewEngine(cfg)
 	if err != nil {
 		return nil, nil, err
 	}
-	sc := &singleClient{UniversalClient: client}
+	sc := &redisClient{UniversalClient: client}
 	return sc, func() {
 		client.Close()
 	}, nil
 }
 
-type SingleConfig struct {
+type RedisConfig struct {
 	Addr     string `json:"addr" mapstructure:"addr"`
 	Password string `json:"password" mapstructure:"password"`
 	DB       int    `json:"db" mapstructure:"db"`
 	PoolSize int    `json:"pool_size" mapstructure:"pool_size"`
 }
 
-func NewClient(cfg SingleConfig) (*redis.Client, error) {
+func NewEngine(cfg RedisConfig) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.Addr,
 		Password: cfg.Password,
