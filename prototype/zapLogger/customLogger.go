@@ -15,9 +15,9 @@ import (
 )
 
 // CustomLogger 自定义zap日志，支持日志切割归档
-func CustomLogger(lumberjackLogger *lumberjack.Logger, outPutFile string, extraFieldMap map[string]string) {
+func CustomLogger(lumberjackLogger *lumberjack.Logger, outputFile string, extraFieldMap map[string]string) {
 	encoder := getEncoder()
-	writeSyncer := getWriteSyncer(lumberjackLogger, outPutFile)
+	writeSyncer := getWriteSyncer(lumberjackLogger, outputFile)
 
 	logLevel := zapcore.DebugLevel
 	if env.IsReleasing() {
