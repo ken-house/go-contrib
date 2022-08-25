@@ -24,7 +24,7 @@ func SimpleLogger(outputPaths []string, extraFieldMap map[string]string) {
 		for _, filePath := range outputPaths {
 			_, err = tools.FileNotExistAndCreate(filePath)
 			if err != nil {
-				log.Fatalln(err)
+				log.Panicln(err)
 			}
 			outPutPathsArr = append(outPutPathsArr, filePath)
 		}
@@ -64,7 +64,7 @@ func SimpleLogger(outputPaths []string, extraFieldMap map[string]string) {
 	logger, err = config.Build(optionList...)
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 	defer logger.Sync()
 

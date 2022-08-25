@@ -1,10 +1,8 @@
 package zapLogger
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/ken-house/go-contrib/utils/tools"
 
@@ -62,13 +60,13 @@ func getWriteSyncer(lumberjackLogger *lumberjack.Logger, outPutFile string) zapc
 	if lumberjackLogger != nil { // 使用lumberjack进行日志切割
 		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(lumberjackLogger))
 	} else { // 不使用切割
-		// 确保目录存在，不存在则创建目录
-		if outPutFile == "" {
-			outPutFile = fmt.Sprintf("./logs/log_%s.log", time.Now().Format("20060102"))
+		if outPutFile == "" { // 仅控制台输出
+			return zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout))
 		}
+		// 确保目录存在，不存在则创建目录
 		file, err := tools.FileNotExistAndCreate(outPutFile)
 		if err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		return zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(file))
 	}
