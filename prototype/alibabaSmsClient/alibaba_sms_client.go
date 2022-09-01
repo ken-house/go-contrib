@@ -5,6 +5,7 @@ import (
 	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v2/client"
 	util "github.com/alibabacloud-go/tea-utils/service"
 	"github.com/alibabacloud-go/tea/tea"
+	"github.com/pkg/errors"
 )
 
 type AlibabaSmsClient interface {
@@ -77,8 +78,8 @@ func (cli *alibabaSmsClient) SendCode(params SendSmsParams) (err error) {
 		} else {
 			error.Message = tea.String(tryErr.Error())
 		}
-		// 如有需要，请打印 error
-		//util.AssertAsString(error.Message)
+		errMsg := util.AssertAsString(error.Message)
+		return errors.New(*errMsg)
 	}
 	return err
 }
