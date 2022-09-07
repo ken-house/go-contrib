@@ -18,7 +18,7 @@ type alibabaSmsClient struct {
 
 // ClientConfig 连接客户端配置
 type ClientConfig struct {
-	Endpoint        string `json:"endpoint" mapstructure:"endpoint"`
+	EndPoint        string `json:"end_point" mapstructure:"end_point"`
 	AccessKeyId     string `json:"access_key_id" mapstructure:"access_key_id"`
 	AccessKeySecret string `json:"access_key_secret" mapstructure:"access_key_secret"`
 }
@@ -35,7 +35,7 @@ type SendSmsParams struct {
 func CreateClient(cfg ClientConfig) (AlibabaSmsClient, error) {
 	config := &openapi.Config{
 		// 访问的域名
-		Endpoint: &cfg.Endpoint,
+		Endpoint: &cfg.EndPoint,
 		// 您的 AccessKey ID
 		AccessKeyId: &cfg.AccessKeyId,
 		// 您的 AccessKey Secret
