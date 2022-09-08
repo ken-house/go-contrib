@@ -13,7 +13,7 @@ type ConsulClient interface {
 	DeregisterService(serviceId string) error
 	GetConfig(consulPath string) ([]byte, error)
 	WatchConfig(addr string, consulPath string, OnChange func([]byte)) error
-	FindHealthInstanceAddress(serviceId string) (string, error)
+	FindHealthInstanceAddress(serviceName string) (string, error)
 }
 
 type consulClient struct {
