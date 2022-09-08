@@ -3,6 +3,8 @@ package consulClient
 import (
 	"fmt"
 
+	"errors"
+
 	"github.com/hashicorp/consul/api/watch"
 
 	consulApi "github.com/hashicorp/consul/api"
@@ -64,12 +66,10 @@ func (cli *consulClient) FindHealthInstanceAddress(serviceName string) (string, 
 	if err != nil {
 		return "", err
 	}
-	var address string
 	for _, v := range serviceList {
-		address = fmt.Sprintf("%s:%d", v.Service.Address, v.Service.Port)
-		break
+		return v.Service.Address, nil
 	}
-	return address, nil
+	return "", errors.New("no found")
 }
 
 // GetConfig 获取配置
