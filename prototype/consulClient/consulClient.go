@@ -22,9 +22,14 @@ type consulClient struct {
 	Client *consulApi.Client
 }
 
-func NewClient(addr string) (ConsulClient, error) {
+type ConsulConfig struct {
+	Host string `json:"host" mapstructure:"host"`
+	Port int    `json:"port" mapstructure:"port"`
+}
+
+func NewClient(config ConsulConfig) (ConsulClient, error) {
 	cfg := consulApi.DefaultConfig()
-	cfg.Address = addr
+	cfg.Address = fmt.Sprintf("%s:%d", config.Host, config.Port)
 	cli, err := consulApi.NewClient(cfg)
 	if err != nil {
 		return nil, err
