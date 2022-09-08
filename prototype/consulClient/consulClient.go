@@ -52,3 +52,9 @@ func (cli *consulClient) RegisterService(serviceName string, ip string, port int
 func (cli *consulClient) DeregisterService(serviceId string) error {
 	return cli.Client.Agent().ServiceDeregister(serviceId)
 }
+
+// GetConfig 获取配置
+func (cli *consulClient) GetConfig(consulPath string) ([]byte, error) {
+	kv, _, err := cli.Client.KV().Get(consulPath, nil)
+	return kv.Value, err
+}
