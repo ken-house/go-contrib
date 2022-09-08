@@ -13,6 +13,7 @@ type ConsulClient interface {
 	DeregisterService(serviceId string) error
 	GetConfig(consulPath string) ([]byte, error)
 	WatchConfig(addr string, consulPath string, OnChange func([]byte)) error
+	FindHealthInstanceAddress(serviceId string) (string, error)
 }
 
 type consulClient struct {
@@ -55,6 +56,15 @@ func (cli *consulClient) RegisterService(serviceName string, ip string, port int
 // DeregisterService 注销服务
 func (cli *consulClient) DeregisterService(serviceId string) error {
 	return cli.Client.Agent().ServiceDeregister(serviceId)
+}
+
+// FindHealthInstanceAddress 根据serviceId查找到一个健康的服务实例，获取其地址
+func (cli *consulClient) FindHealthInstanceAddress(serviceId string) (string, error) {
+	_, serviceInfo, err := cli.Client.Agent().AgentHealthServiceByID(serviceId)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s:%d", serviceInfo.Service.Address, serviceInfo.Service.Port), nil
 }
 
 // GetConfig 获取配置
