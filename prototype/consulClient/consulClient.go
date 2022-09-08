@@ -59,12 +59,17 @@ func (cli *consulClient) DeregisterService(serviceId string) error {
 }
 
 // FindHealthInstanceAddress 根据serviceId查找到一个健康的服务实例，获取其地址
-func (cli *consulClient) FindHealthInstanceAddress(serviceId string) (string, error) {
-	_, serviceInfo, err := cli.Client.Agent().AgentHealthServiceByID(serviceId)
+func (cli *consulClient) FindHealthInstanceAddress(serviceName string) (string, error) {
+	_, serviceList, err := cli.Client.Agent().AgentHealthServiceByName(serviceName)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s:%d", serviceInfo.Service.Address, serviceInfo.Service.Port), nil
+	var address string
+	for _, v := range serviceList {
+		address = fmt.Sprintf("%s:%d", v.Service.Address, v.Service.Port)
+		break
+	}
+	return address, nil
 }
 
 // GetConfig 获取配置
