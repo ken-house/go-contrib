@@ -3,6 +3,8 @@ package consulClient
 import (
 	"fmt"
 
+	"github.com/hashicorp/consul/api/watch"
+
 	consulApi "github.com/hashicorp/consul/api"
 )
 
@@ -10,6 +12,7 @@ type ConsulClient interface {
 	RegisterService(serviceName string, ip string, port int) error
 	DeregisterService(serviceId string) error
 	GetConfig(consulPath string) ([]byte, error)
+	WatchConfig(addr string, consulPath string, OnChange func([]byte)) error
 }
 
 type consulClient struct {
@@ -58,4 +61,23 @@ func (cli *consulClient) DeregisterService(serviceId string) error {
 func (cli *consulClient) GetConfig(consulPath string) ([]byte, error) {
 	kv, _, err := cli.Client.KV().Get(consulPath, nil)
 	return kv.Value, err
+}
+
+// WatchConfig 监听配置
+func (cli *consulClient) WatchConfig(addr string, consulPath string, OnChange func([]byte)) error {
+	params := make(map[string]interface{})
+	params["type"] = "key"
+	params["key"] = consulPath
+	w, err := watch.Parse(params)
+	if err != nil {
+		return err
+	}
+	w.Handler = func(u uint64, i interface{}) {
+		kv := i.(*consulApi.KVPair)
+		OnChange(kv.Value)
+	}
+	if err = w.Run(addr); err != nil {
+		return err
+	}
+	return nil
 }
