@@ -9,6 +9,7 @@ import (
 type ConsulClient interface {
 	RegisterService(serviceName string, ip string, port int) error
 	DeregisterService(serviceId string) error
+	GetConfig(consulPath string) ([]byte, error)
 }
 
 type consulClient struct {
