@@ -8,7 +8,7 @@ import (
 
 type ProducerAsyncClient interface {
 	sarama.AsyncProducer
-	SendOne(topic string, key string, message string, partition int32) error
+	SendOne(topic string, key string, message string, partition int32)
 }
 
 type producerAsyncClient struct {
@@ -50,7 +50,7 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 }
 
 // SendOne 单条消息发送
-func (cli *producerAsyncClient) SendOne(topic string, key string, message string, partition int32) error {
+func (cli *producerAsyncClient) SendOne(topic string, key string, message string, partition int32) {
 	msg := &sarama.ProducerMessage{
 		Topic:     topic,
 		Value:     sarama.StringEncoder(message),
@@ -59,10 +59,5 @@ func (cli *producerAsyncClient) SendOne(topic string, key string, message string
 	if key != "" {
 		msg.Key = sarama.StringEncoder(key)
 	}
-	select {
-	case cli.Input() <- msg:
-		return nil
-	case err := <-cli.Errors():
-		return err
-	}
+	cli.Input() <- msg
 }
