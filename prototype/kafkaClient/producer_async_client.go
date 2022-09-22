@@ -1,8 +1,6 @@
 package kafkaClient
 
 import (
-	"time"
-
 	"github.com/Shopify/sarama"
 )
 
@@ -25,19 +23,19 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	// 设置达到多少条消息才发送到kafka，相当于batch.size(批次大小)
 	//config.Producer.Flush.Messages = cfg.ProducerConfig.BatchMessageNum
 	// 设置间隔多少秒才发送到kafka，相当于linger.ms（等待时间ms）
-	if cfg.ProducerConfig.LingerMs > 0 {
-		config.Producer.Flush.Frequency = time.Duration(cfg.ProducerConfig.LingerMs) * time.Millisecond
-	}
+	//if cfg.ProducerConfig.LingerMs > 0 {
+	//	config.Producer.Flush.Frequency = time.Duration(cfg.ProducerConfig.LingerMs) * time.Millisecond
+	//}
 	// 指定数据压缩方式
 	//config.Producer.Compression = cfg.ProducerConfig.CompressionType
 	// 生产者缓冲区大小
-	if cfg.ProducerConfig.RecordAccumulator > 0 {
-		config.Producer.MaxMessageBytes = cfg.ProducerConfig.RecordAccumulator
-	}
+	//if cfg.ProducerConfig.RecordAccumulator > 0 {
+	//	config.Producer.MaxMessageBytes = cfg.ProducerConfig.RecordAccumulator
+	//}
 	// 成功交付的消息将在success channel返回 必须指定为true
-	config.Producer.Return.Successes = true
+	//config.Producer.Return.Successes = true
 	// 指定分区算法
-	setPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
+	//setPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
 	// 建立同步生产者连接
 	producerClient, err := sarama.NewAsyncProducer(cfg.ServerAddrList, config)
 	if err != nil {
