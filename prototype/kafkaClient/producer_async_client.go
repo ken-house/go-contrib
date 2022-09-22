@@ -45,7 +45,7 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	}
 
 	return &producerAsyncClient{producerClient}, func() {
-		defer producerClient.AsyncClose()
+		defer producerClient.Close()
 	}, nil
 }
 
