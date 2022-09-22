@@ -24,9 +24,9 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	config.Producer.RequiredAcks = sarama.RequiredAcks(cfg.ProducerConfig.Ack)
 	// 设置达到多少条消息才发送到kafka，相当于batch.size(批次大小)
 	config.Producer.Flush.Messages = cfg.ProducerConfig.BatchMessageNum
-	// 设置间隔多少秒才发送到kafka，相当于linger.ms（等待时间）
+	// 设置间隔多少秒才发送到kafka，相当于linger.ms（等待时间ms）
 	if cfg.ProducerConfig.LingerMs > 0 {
-		config.Producer.Flush.Frequency = time.Duration(cfg.ProducerConfig.LingerMs) * time.Second
+		config.Producer.Flush.Frequency = time.Duration(cfg.ProducerConfig.LingerMs) * time.Millisecond
 	}
 	// 指定数据压缩方式
 	config.Producer.Compression = cfg.ProducerConfig.CompressionType
