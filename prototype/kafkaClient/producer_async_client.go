@@ -8,7 +8,7 @@ import (
 
 type ProducerAsyncClient interface {
 	sarama.AsyncProducer
-	SendOne(topic string, key string, message string, partition int32)
+	SendOne(topic string, key string, message string, partition int32) error
 }
 
 type producerAsyncClient struct {
@@ -34,8 +34,6 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	if cfg.ProducerConfig.RecordAccumulator > 0 {
 		config.Producer.MaxMessageBytes = cfg.ProducerConfig.RecordAccumulator
 	}
-	// 成功交付的消息将在success channel返回 必须指定为true
-	//config.Producer.Return.Successes = true
 	// 指定分区算法
 	setPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
 	// 建立同步生产者连接
@@ -45,12 +43,12 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	}
 
 	return &producerAsyncClient{producerClient}, func() {
-		defer producerClient.Close()
+		defer producerClient.AsyncClose()
 	}, nil
 }
 
 // SendOne 单条消息发送
-func (cli *producerAsyncClient) SendOne(topic string, key string, message string, partition int32) {
+func (cli *producerAsyncClient) SendOne(topic string, key string, message string, partition int32) error {
 	msg := &sarama.ProducerMessage{
 		Topic:     topic,
 		Value:     sarama.StringEncoder(message),
@@ -59,5 +57,10 @@ func (cli *producerAsyncClient) SendOne(topic string, key string, message string
 	if key != "" {
 		msg.Key = sarama.StringEncoder(key)
 	}
-	cli.Input() <- msg
+	select {
+	case cli.Input() <- msg:
+		return nil
+	case err := <-cli.Errors():
+		return err
+	}
 }

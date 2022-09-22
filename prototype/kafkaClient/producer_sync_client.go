@@ -35,7 +35,7 @@ func NewProducerSyncClient(cfg Config) (ProducerSyncClient, func(), error) {
 	if cfg.ProducerConfig.RecordAccumulator > 0 {
 		config.Producer.MaxMessageBytes = cfg.ProducerConfig.RecordAccumulator
 	}
-	// 成功交付的消息将在success channel返回 必须指定为true
+	// 成功交付的消息将在success channel返回 同步发送必须指定为true
 	config.Producer.Return.Successes = true
 	// 指定分区算法
 	setPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
