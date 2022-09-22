@@ -11,7 +11,7 @@ type Config struct {
 
 // ProducerConfig kafka生产者配置参数
 type ProducerConfig struct {
-	Ack               int                     `json:"acks" mapstructure:"acks"`                             // 应答类型 0  1 -1
+	Ack               int                     `json:"ack" mapstructure:"ack"`                               // 应答类型 0  1 -1
 	PartitionerPolicy int                     `json:"partitioner_policy" mapstructure:"partitioner_policy"` // 分区算法
 	BatchMessageNum   int                     `json:"batch_message_num" mapstructure:"batch_message_num"`   // 达到多少条消息才发送
 	LingerMs          int                     `json:"linger_ms" mapstructure:"linger_ms"`                   // 达到多少秒消息才发送
