@@ -10,7 +10,7 @@ import (
 
 type ConsumerGroupClient interface {
 	sarama.ConsumerGroup
-	ConsumeTopic(ctx context.Context, topicList []string, consumeHandler func(message *sarama.ConsumerMessage))
+	ConsumeTopic(ctx context.Context, topicList []string, consumeFunc func(message *sarama.ConsumerMessage)) error
 }
 
 type consumerGroupClient struct {
@@ -59,7 +59,7 @@ func NewConsumerGroupClient(cfg Config) (ConsumerGroupClient, func(), error) {
 }
 
 // ConsumeTopic 消费主题
-func (cli *consumerGroupClient) ConsumeTopic(ctx context.Context, topicList []string, consumeFunc func(message *sarama.ConsumerMessage)) {
+func (cli *consumerGroupClient) ConsumeTopic(ctx context.Context, topicList []string, consumeFunc func(message *sarama.ConsumerMessage)) error {
 	consumerHandler := consumeHandler{
 		handle: consumeFunc,
 		ready:  make(chan struct{}),
@@ -73,6 +73,7 @@ func (cli *consumerGroupClient) ConsumeTopic(ctx context.Context, topicList []st
 		}
 	}()
 	<-consumerHandler.ready
+	return nil
 }
 
 type consumeHandler struct {
