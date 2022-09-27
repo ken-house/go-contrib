@@ -1,4 +1,4 @@
-package kafkaClient
+package sarama
 
 import (
 	"time"
@@ -38,7 +38,7 @@ func NewProducerSyncClient(cfg Config) (ProducerSyncClient, func(), error) {
 	// 成功交付的消息将在success channel返回 同步发送必须指定为true
 	config.Producer.Return.Successes = true
 	// 指定分区算法
-	setPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
+	setProducerPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
 	// 建立同步生产者连接
 	producerClient, err := sarama.NewSyncProducer(cfg.ServerAddrList, config)
 	if err != nil {

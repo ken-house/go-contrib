@@ -1,4 +1,4 @@
-package kafkaClient
+package sarama
 
 import (
 	"sync"
@@ -8,7 +8,7 @@ import (
 
 type ConsumerClient interface {
 	sarama.Consumer
-	ConsumeTopic(topic string, isNew int64, consumerFunc func(message *sarama.ConsumerMessage)) error
+	ConsumeTopic(topic string, isNew int64, consumerHandler func(message *sarama.ConsumerMessage)) error
 }
 
 type consumerClient struct {
@@ -30,7 +30,7 @@ func NewConsumerClient(cfg Config) (ConsumerClient, func(), error) {
 }
 
 // ConsumeTopic 消费整个Topic
-func (cli *consumerClient) ConsumeTopic(topic string, isNew int64, consumerFunc func(message *sarama.ConsumerMessage)) error {
+func (cli *consumerClient) ConsumeTopic(topic string, isNew int64, consumerHandler func(message *sarama.ConsumerMessage)) error {
 	partitionList, err := cli.Partitions(topic) // 通过topic获取到所有的分区
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (cli *consumerClient) ConsumeTopic(topic string, isNew int64, consumerFunc 
 		go func(partitionConsumer sarama.PartitionConsumer) {
 			for msg := range partitionConsumer.Messages() {
 				defer wg.Done()
-				consumerFunc(msg)
+				consumerHandler(msg)
 			}
 		}(partitionConsumer)
 	}

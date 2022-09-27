@@ -1,4 +1,4 @@
-package kafkaClient
+package sarama
 
 import (
 	"time"
@@ -35,7 +35,7 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 		config.Producer.MaxMessageBytes = cfg.ProducerConfig.RecordAccumulator
 	}
 	// 指定分区算法
-	setPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
+	setProducerPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
 	// 建立同步生产者连接
 	producerClient, err := sarama.NewAsyncProducer(cfg.ServerAddrList, config)
 	if err != nil {
