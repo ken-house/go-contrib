@@ -1,4 +1,4 @@
-package sarama
+package kafkaClient
 
 import "github.com/Shopify/sarama"
 
