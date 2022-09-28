@@ -17,6 +17,8 @@ type ProducerConfig struct {
 	LingerMs          int                     `json:"linger_ms" mapstructure:"linger_ms"`                   // 达到多少秒消息才发送（毫秒）
 	CompressionType   sarama.CompressionCodec `json:"compression_type" mapstructure:"compression_type"`     // 压缩方式
 	RecordAccumulator int                     `json:"record_accumulator" mapstructure:"record_accumulator"` // 生产区缓冲区大小，单位为字节
+	IdempotentEnabled bool                    `json:"idempotent_enabled" mapstructure:"idempotent_enabled"` // 是否开启事务幂等
+	MaxOpenRequests   int                     `json:"max_open_requests" mapstructure:"max_open_requests"`   // 生产者sender线程最大缓存请求数
 }
 
 // ConsumerConfig kafka消费者配置参数

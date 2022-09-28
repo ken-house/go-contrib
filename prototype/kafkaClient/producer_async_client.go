@@ -18,8 +18,14 @@ type producerAsyncClient struct {
 // NewProducerAsyncClient 异步生产者
 func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	config := sarama.NewConfig()
-	//// 指定kafka版本 - 需根据实际kafka版本调整
+	// 指定kafka版本 - 需根据实际kafka版本调整
 	config.Version = sarama.V2_8_1_0
+	// 开启幂等，保证数据不重复
+	config.Producer.Idempotent = cfg.ProducerConfig.IdempotentEnabled
+	// 生产者sender线程最大缓存请求数
+	if cfg.ProducerConfig.MaxOpenRequests > 0 {
+		config.Net.MaxOpenRequests = cfg.ProducerConfig.MaxOpenRequests
+	}
 	// 指定应答方式
 	config.Producer.RequiredAcks = sarama.RequiredAcks(cfg.ProducerConfig.Ack)
 	// 设置达到多少条消息才发送到kafka，相当于batch.size(批次大小)
