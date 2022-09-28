@@ -42,9 +42,30 @@ func setProducerPartitionPolicy(config *sarama.Config, partitionerPolicy string)
 		config.Producer.Partitioner = sarama.NewManualPartitioner
 	case "hash": // 按key的hashcode计算分区
 		config.Producer.Partitioner = sarama.NewHashPartitioner
+	case "custom":
+		config.Producer.Partitioner = NewCustomPartitioner
 	default: // 按key的hashcode计算分区
 		config.Producer.Partitioner = sarama.NewHashPartitioner
 	}
+}
+
+func NewCustomPartitioner(topic string) sarama.Partitioner {
+	return new(customPartitioner)
+}
+
+// 自定义生产者分区策略
+type customPartitioner struct {
+	partition int32
+}
+
+// Partition 根据自定义方法计算出消息在总分区数分配到哪个分区
+func (p *customPartitioner) Partition(message *sarama.ProducerMessage, numPartitions int32) (int32, error) {
+	return 1, nil
+}
+
+// RequiresConsistency 是否要求分区程序需要一致性
+func (p *customPartitioner) RequiresConsistency() bool {
+	return false
 }
 
 // 指定消费者分区算法
