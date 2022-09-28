@@ -49,25 +49,6 @@ func setProducerPartitionPolicy(config *sarama.Config, partitionerPolicy string)
 	}
 }
 
-func NewCustomPartitioner(topic string) sarama.Partitioner {
-	return &customPartitioner{}
-}
-
-// 自定义生产者分区策略
-type customPartitioner struct {
-	partition int32
-}
-
-// Partition 根据自定义方法计算出消息在总分区数分配到哪个分区
-func (p *customPartitioner) Partition(message *sarama.ProducerMessage, numPartitions int32) (int32, error) {
-	return 1, nil
-}
-
-// RequiresConsistency 是否要求分区程序需要一致性
-func (p *customPartitioner) RequiresConsistency() bool {
-	return false
-}
-
 // 指定消费者分区算法
 func setConsumerPartitionPolicy(config *sarama.Config, balanceStrategy string) {
 	switch balanceStrategy {
