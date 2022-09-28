@@ -19,6 +19,7 @@ type ProducerConfig struct {
 	RecordAccumulator int                     `json:"record_accumulator" mapstructure:"record_accumulator"` // 生产区缓冲区大小，单位为字节
 	IdempotentEnabled bool                    `json:"idempotent_enabled" mapstructure:"idempotent_enabled"` // 是否开启事务幂等
 	MaxOpenRequests   int                     `json:"max_open_requests" mapstructure:"max_open_requests"`   // 生产者sender线程最大缓存请求数
+	RetryMax          int                     `json:"retry_max" mapstructure:"retry_max"`                   // 重试次数
 }
 
 // ConsumerConfig kafka消费者配置参数

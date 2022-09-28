@@ -26,6 +26,10 @@ func NewProducerAsyncClient(cfg Config) (ProducerAsyncClient, func(), error) {
 	if cfg.ProducerConfig.MaxOpenRequests > 0 {
 		config.Net.MaxOpenRequests = cfg.ProducerConfig.MaxOpenRequests
 	}
+	// 开启幂等需要设置重试次数
+	if cfg.ProducerConfig.RetryMax > 0 {
+		config.Producer.Retry.Max = cfg.ProducerConfig.RetryMax
+	}
 	// 指定应答方式
 	config.Producer.RequiredAcks = sarama.RequiredAcks(cfg.ProducerConfig.Ack)
 	// 设置达到多少条消息才发送到kafka，相当于batch.size(批次大小)
