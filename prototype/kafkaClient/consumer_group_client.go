@@ -8,6 +8,8 @@ import (
 	"github.com/Shopify/sarama"
 )
 
+var offsetAutoCommitEnabled bool
+
 type ConsumerGroupClient interface {
 	sarama.ConsumerGroup
 	ConsumeTopic(ctx context.Context, topicList []string, consumeFunc func(message *sarama.ConsumerMessage)) error
@@ -37,7 +39,8 @@ func NewConsumerGroupClient(cfg Config) (ConsumerGroupClient, func(), error) {
 	if cfg.ConsumerConfig.FromBeginning {
 		config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	}
-	// offset是否自动提交
+	// offset是否自动提交，同时设置一个全局变量offsetAutoCommitEnabled
+	offsetAutoCommitEnabled = cfg.ConsumerConfig.OffsetAutoCommitEnabled
 	if !cfg.ConsumerConfig.OffsetAutoCommitEnabled {
 		config.Consumer.Offsets.AutoCommit.Enable = cfg.ConsumerConfig.OffsetAutoCommitEnabled
 	}
@@ -91,6 +94,8 @@ func (handler *consumeHandler) Setup(session sarama.ConsumerGroupSession) error 
 			fmt.Printf("consumer setup error: %v\n", err)
 		}
 	}()
+	// 指定offset消费
+	session.ResetOffset("first", 1, 443, "")
 	close(handler.ready)
 	return nil
 }
@@ -108,11 +113,13 @@ func (handler *consumeHandler) ConsumeClaim(session sarama.ConsumerGroupSession,
 		session.MarkMessage(msg, "")
 
 		// 若设置了手动提交offset，即：offset_auto_commit_enabled: true,需要添加以下代码进行手动提交
-		fmt.Println(msg.Offset)
-		i++
-		// 每10条消息提交一次offset
-		if i%10 == 0 {
-			session.Commit()
+		if !offsetAutoCommitEnabled {
+			fmt.Println(msg.Offset)
+			i++
+			// 每10条消息提交一次offset
+			if i%10 == 0 {
+				session.Commit()
+			}
 		}
 	}
 	return nil
