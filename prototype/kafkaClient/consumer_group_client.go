@@ -100,8 +100,11 @@ func (handler *consumeHandler) Setup(session sarama.ConsumerGroupSession) error 
 	}()
 	// 指定offset消费
 	if consumerResetOffsetConfig.Enabled {
-		session.ResetOffset(consumerResetOffsetConfig.Topic, consumerResetOffsetConfig.Partition, consumerResetOffsetConfig.Offset, "")
+		for _, v := range consumerResetOffsetConfig.List {
+			session.ResetOffset(v.Topic, v.Partition, v.Offset, "")
+		}
 	}
+	close(handler.ready)
 	return nil
 }
 

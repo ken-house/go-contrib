@@ -42,7 +42,11 @@ type ConsumerConfig struct {
 
 // ConsumerResetOffsetConfig 指定offset消费配置参数
 type ConsumerResetOffsetConfig struct {
-	Enabled   bool   `json:"enabled" mapstructure:"enabled"` // 是否开启指定offset消费
+	Enabled bool                  `json:"enabled" mapstructure:"enabled"` // 是否开启指定offset消费
+	List    []ConsumerResetOffset `json:"list" mapstructure:"list"`       // 指定offset消费列表
+}
+
+type ConsumerResetOffset struct {
 	Topic     string `json:"topic" mapstructure:"topic"`
 	Partition int32  `json:"partition" mapstructure:"partition"`
 	Offset    int64  `json:"offset" mapstructure:"offset"`
