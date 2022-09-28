@@ -9,6 +9,7 @@ import (
 )
 
 var offsetAutoCommitEnabled bool
+var consumerResetOffsetConfig ConsumerResetOffsetConfig
 
 type ConsumerGroupClient interface {
 	sarama.ConsumerGroup
@@ -39,8 +40,7 @@ func NewConsumerGroupClient(cfg Config) (ConsumerGroupClient, func(), error) {
 	if cfg.ConsumerConfig.FromBeginning {
 		config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	}
-	// offset是否自动提交，同时设置一个全局变量offsetAutoCommitEnabled
-	offsetAutoCommitEnabled = cfg.ConsumerConfig.OffsetAutoCommitEnabled
+	// offset是否自动提交
 	if !cfg.ConsumerConfig.OffsetAutoCommitEnabled {
 		config.Consumer.Offsets.AutoCommit.Enable = cfg.ConsumerConfig.OffsetAutoCommitEnabled
 	}
@@ -59,6 +59,10 @@ func NewConsumerGroupClient(cfg Config) (ConsumerGroupClient, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
+
+	// 全局变量设置
+	offsetAutoCommitEnabled = cfg.ConsumerConfig.OffsetAutoCommitEnabled
+	consumerResetOffsetConfig = cfg.ConsumerResetOffsetConfig
 
 	return &consumerGroupClient{client}, func() {
 		defer client.Close()
@@ -95,8 +99,9 @@ func (handler *consumeHandler) Setup(session sarama.ConsumerGroupSession) error 
 		}
 	}()
 	// 指定offset消费
-	session.ResetOffset("first", 1, 443, "")
-	close(handler.ready)
+	if consumerResetOffsetConfig.Enabled {
+		session.ResetOffset(consumerResetOffsetConfig.Topic, consumerResetOffsetConfig.Partition, consumerResetOffsetConfig.Offset, "")
+	}
 	return nil
 }
 

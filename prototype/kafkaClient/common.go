@@ -8,9 +8,10 @@ import (
 
 // Config kafka连接及配置信息
 type Config struct {
-	ServerAddrList []string       `json:"server_addr_list" mapstructure:"server_addr_list"` // kafka地址
-	ProducerConfig ProducerConfig `json:"producer_config"  mapstructure:"producer_config"`  // 生产者配置
-	ConsumerConfig ConsumerConfig `json:"consumer_config" mapstructure:"consumer_config"`   // 消费者配置
+	ServerAddrList            []string                  `json:"server_addr_list" mapstructure:"server_addr_list"`                         // kafka地址
+	ProducerConfig            ProducerConfig            `json:"producer_config"  mapstructure:"producer_config"`                          // 生产者配置
+	ConsumerConfig            ConsumerConfig            `json:"consumer_config" mapstructure:"consumer_config"`                           // 消费者配置
+	ConsumerResetOffsetConfig ConsumerResetOffsetConfig `json:"consumer_reset_offset_config" mapstructure:"consumer_reset_offset_config"` // 指定offset消费配置
 }
 
 // ProducerConfig kafka生产者配置参数
@@ -37,6 +38,14 @@ type ConsumerConfig struct {
 	OffsetAutoCommitEnabled  bool   `json:"offset_auto_commit_enabled" mapstructure:"offset_auto_commit_enabled"`   // offset是否自动提交
 	OffsetAutoCommitInterval int    `json:"offset_auto_commit_interval" mapstructure:"offset_auto_commit_interval"` // 自动提交offset的时间间隔(秒)
 	MaxPollRecords           int    `json:"max_poll_records" mapstructure:"max_poll_records"`                       // 一次拉取返回消息的最大条数
+}
+
+// ConsumerResetOffsetConfig 指定offset消费配置参数
+type ConsumerResetOffsetConfig struct {
+	Enabled   bool   `json:"enabled" mapstructure:"enabled"` // 是否开启指定offset消费
+	Topic     string `json:"topic" mapstructure:"topic"`
+	Partition int32  `json:"partition" mapstructure:"partition"`
+	Offset    int64  `json:"offset" mapstructure:"offset"`
 }
 
 // NewKafkaClient 创建一个kafka客户端
