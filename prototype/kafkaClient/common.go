@@ -36,6 +36,7 @@ type ConsumerConfig struct {
 	FromBeginning            bool   `json:"from_beginning" mapstructure:"from_beginning"`                           // 是否从头开始消费
 	OffsetAutoCommitEnabled  bool   `json:"offset_auto_commit_enabled" mapstructure:"offset_auto_commit_enabled"`   // offset是否自动提交
 	OffsetAutoCommitInterval int    `json:"offset_auto_commit_interval" mapstructure:"offset_auto_commit_interval"` // 自动提交offset的时间间隔(秒)
+	MaxPollRecords           int    `json:"max_poll_records" mapstructure:"max_poll_records"`                       // 一次拉取返回消息的最大条数
 }
 
 // NewKafkaClient 创建一个kafka客户端

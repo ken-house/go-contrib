@@ -45,6 +45,10 @@ func NewConsumerGroupClient(cfg Config) (ConsumerGroupClient, func(), error) {
 	if cfg.ConsumerConfig.OffsetAutoCommitInterval > 0 {
 		config.Consumer.Offsets.AutoCommit.Interval = time.Duration(cfg.ConsumerConfig.OffsetAutoCommitInterval) * time.Second
 	}
+	// 一次拉取返回消息的最大条数
+	if cfg.ConsumerConfig.MaxPollRecords > 0 {
+		config.ChannelBufferSize = cfg.ConsumerConfig.MaxPollRecords
+	}
 	// 设置消费者分区分配算法
 	setConsumerPartitionPolicy(config, cfg.ConsumerConfig.BalanceStrategy)
 	// 创建消费者组客户端
@@ -96,9 +100,20 @@ func (handler *consumeHandler) Cleanup(session sarama.ConsumerGroupSession) erro
 }
 
 func (handler *consumeHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	i := 0
 	for msg := range claim.Messages() {
+		// 处理消息
 		handler.handle(msg)
+		// 标记消息已经被消费
 		session.MarkMessage(msg, "")
+
+		// 若设置了手动提交offset，即：offset_auto_commit_enabled: true,需要添加以下代码进行手动提交
+		fmt.Println(msg.Offset)
+		i++
+		// 每10条消息提交一次offset
+		if i%10 == 0 {
+			session.Commit()
+		}
 	}
 	return nil
 }
