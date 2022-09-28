@@ -1,6 +1,10 @@
 package kafkaClient
 
-import "github.com/Shopify/sarama"
+import (
+	"time"
+
+	"github.com/Shopify/sarama"
+)
 
 // Config kafka连接及配置信息
 type Config struct {
@@ -15,8 +19,8 @@ type ProducerConfig struct {
 	PartitionerPolicy string                  `json:"partitioner_policy" mapstructure:"partitioner_policy"` // 分区算法
 	BatchMessageNum   int                     `json:"batch_message_num" mapstructure:"batch_message_num"`   // 达到多少条消息才发送
 	LingerMs          int                     `json:"linger_ms" mapstructure:"linger_ms"`                   // 达到多少秒消息才发送（毫秒）
+	MessageMaxBytes   int                     `json:"message_max_bytes" mapstructure:"message_max_bytes"`   // 一条消息最大字节数
 	CompressionType   sarama.CompressionCodec `json:"compression_type" mapstructure:"compression_type"`     // 压缩方式
-	RecordAccumulator int                     `json:"record_accumulator" mapstructure:"record_accumulator"` // 生产区缓冲区大小，单位为字节
 	IdempotentEnabled bool                    `json:"idempotent_enabled" mapstructure:"idempotent_enabled"` // 是否开启事务幂等
 	MaxOpenRequests   int                     `json:"max_open_requests" mapstructure:"max_open_requests"`   // 生产者sender线程最大缓存请求数
 	RetryMax          int                     `json:"retry_max" mapstructure:"retry_max"`                   // 重试次数
@@ -32,6 +36,44 @@ type ConsumerConfig struct {
 	FromBeginning            bool   `json:"from_beginning" mapstructure:"from_beginning"`                           // 是否从头开始消费
 	OffsetAutoCommitEnabled  bool   `json:"offset_auto_commit_enabled" mapstructure:"offset_auto_commit_enabled"`   // offset是否自动提交
 	OffsetAutoCommitInterval int    `json:"offset_auto_commit_interval" mapstructure:"offset_auto_commit_interval"` // 自动提交offset的时间间隔(秒)
+}
+
+// NewKafkaClient 创建一个kafka客户端
+func NewKafkaClient(cfg Config, asyncProducer bool) (sarama.Client, error) {
+	config := sarama.NewConfig()
+	// 指定kafka版本 - 需根据实际kafka版本调整
+	config.Version = sarama.V2_8_1_0
+	// 开启幂等，保证数据不重复
+	config.Producer.Idempotent = cfg.ProducerConfig.IdempotentEnabled
+	// 生产者sender线程最大缓存请求数
+	if cfg.ProducerConfig.MaxOpenRequests > 0 {
+		config.Net.MaxOpenRequests = cfg.ProducerConfig.MaxOpenRequests
+	}
+	// 开启幂等需要设置重试次数
+	if cfg.ProducerConfig.RetryMax > 0 {
+		config.Producer.Retry.Max = cfg.ProducerConfig.RetryMax
+	}
+	// 指定应答方式
+	config.Producer.RequiredAcks = sarama.RequiredAcks(cfg.ProducerConfig.Ack)
+	// 设置达到多少条消息才发送到kafka，相当于batch.size(批次大小)
+	config.Producer.Flush.Messages = cfg.ProducerConfig.BatchMessageNum
+	// 设置间隔多少秒才发送到kafka，相当于linger.ms（等待时间ms）
+	if cfg.ProducerConfig.LingerMs > 0 {
+		config.Producer.Flush.Frequency = time.Duration(cfg.ProducerConfig.LingerMs) * time.Millisecond
+	}
+	// 一条消息的最大字节数
+	if cfg.ProducerConfig.MessageMaxBytes > 0 {
+		config.Producer.MaxMessageBytes = cfg.ProducerConfig.MessageMaxBytes
+	}
+	// 指定数据压缩方式
+	config.Producer.Compression = cfg.ProducerConfig.CompressionType
+	// 指定分区算法
+	setProducerPartitionPolicy(config, cfg.ProducerConfig.PartitionerPolicy)
+	// 成功交付的消息将在success channel返回 同步发送必须指定为true
+	if !asyncProducer {
+		config.Producer.Return.Successes = true
+	}
+	return sarama.NewClient(cfg.ServerAddrList, config)
 }
 
 // 指定生产者分区算法
