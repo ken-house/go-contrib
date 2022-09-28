@@ -50,7 +50,7 @@ func setProducerPartitionPolicy(config *sarama.Config, partitionerPolicy string)
 }
 
 func NewCustomPartitioner(topic string) sarama.Partitioner {
-	return new(customPartitioner)
+	return &customPartitioner{}
 }
 
 // 自定义生产者分区策略
