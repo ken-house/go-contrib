@@ -27,7 +27,7 @@ type RequestClient interface {
 	PostXML(ctx context.Context, endpoint string, xml string, responseStruct interface{}, querystring map[string]string) (*http.Response, error)
 	Get(ctx context.Context, endpoint string, responseStruct interface{}, querystring map[string]string) (*http.Response, error)
 	GetXML(ctx context.Context, endpoint string, responseStruct interface{}, querystring map[string]string) (*http.Response, error)
-	Do(ctx context.Context, ar *APIRequest, responseStruct interface{}, options ...interface{}) (*http.Response, error)
+	Do(ctx context.Context, ar *apiRequest, responseStruct interface{}, options ...interface{}) (*http.Response, error)
 	ReadRawResponse(response *http.Response, responseStruct interface{}) (*http.Response, error)
 	ReadJSONResponse(response *http.Response, responseStruct interface{}) (*http.Response, error)
 }
@@ -35,19 +35,22 @@ type RequestClient interface {
 type requestClient struct {
 	Base              string
 	Client            *http.Client
-	CACert            []byte
-	SslVerify         bool
 	CustomerHeaderArr map[string]string
 }
 
-func NewRequestClient(base string, sslVerify bool, customerHeaderArr map[string]string, cACert string) RequestClient {
-	return &requestClient{
+func NewRequestClient(base string, customerHeaderArr map[string]string, client *http.Client) RequestClient {
+	requestCli := &requestClient{
 		Base:              base,
 		CustomerHeaderArr: customerHeaderArr,
-		SslVerify:         sslVerify,
-		CACert:            []byte(cACert),
 		Client:            http.DefaultClient,
 	}
+
+	// 若设置了自定义Client，则优先使用
+	if client != nil {
+		requestCli.Client = client
+	}
+
+	return requestCli
 }
 
 func (r *requestClient) PostJSON(ctx context.Context, endpoint string, payloadData map[string]interface{}, responseStruct interface{}, querystring map[string]string) (*http.Response, error) {
@@ -56,7 +59,7 @@ func (r *requestClient) PostJSON(ctx context.Context, endpoint string, payloadDa
 		return nil, errors.New("json Marshal failed")
 	}
 	payload := bytes.NewBufferString(string(data))
-	ar := NewAPIRequest("POST", endpoint, payload)
+	ar := newApiRequest("POST", endpoint, payload)
 	ar.SetHeader("Content-Type", "application/json")
 	return r.Do(ctx, ar, &responseStruct, querystring)
 }
@@ -67,35 +70,35 @@ func (r *requestClient) Post(ctx context.Context, endpoint string, payloadData m
 		data.Set(key, cast.ToString(value))
 	}
 	payload := bytes.NewBufferString(data.Encode())
-	ar := NewAPIRequest("POST", endpoint, payload)
+	ar := newApiRequest("POST", endpoint, payload)
 	ar.SetHeader("Content-Type", "application/x-www-form-urlencoded")
 	return r.Do(ctx, ar, &responseStruct, querystring)
 }
 
 func (r *requestClient) PostFiles(ctx context.Context, endpoint string, payload io.Reader, responseStruct interface{}, querystring map[string]string, files []string) (*http.Response, error) {
-	ar := NewAPIRequest("POST", endpoint, payload)
+	ar := newApiRequest("POST", endpoint, payload)
 	return r.Do(ctx, ar, &responseStruct, querystring, files)
 }
 
 func (r *requestClient) PostXML(ctx context.Context, endpoint string, xml string, responseStruct interface{}, querystring map[string]string) (*http.Response, error) {
 	payload := bytes.NewBuffer([]byte(xml))
-	ar := NewAPIRequest("POST", endpoint, payload)
+	ar := newApiRequest("POST", endpoint, payload)
 	ar.SetHeader("Content-Type", "application/xml")
 	return r.Do(ctx, ar, &responseStruct, querystring)
 }
 
 func (r *requestClient) GetXML(ctx context.Context, endpoint string, responseStruct interface{}, querystring map[string]string) (*http.Response, error) {
-	ar := NewAPIRequest("GET", endpoint, nil)
+	ar := newApiRequest("GET", endpoint, nil)
 	ar.SetHeader("Content-Type", "application/xml")
 	return r.Do(ctx, ar, responseStruct, querystring)
 }
 
 func (r *requestClient) Get(ctx context.Context, endpoint string, responseStruct interface{}, querystring map[string]string) (*http.Response, error) {
-	ar := NewAPIRequest("GET", endpoint, nil)
+	ar := newApiRequest("GET", endpoint, nil)
 	return r.Do(ctx, ar, responseStruct, querystring)
 }
 
-func (r *requestClient) Do(ctx context.Context, ar *APIRequest, responseStruct interface{}, options ...interface{}) (*http.Response, error) {
+func (r *requestClient) Do(ctx context.Context, ar *apiRequest, responseStruct interface{}, options ...interface{}) (*http.Response, error) {
 	if !strings.HasSuffix(ar.Endpoint, "/") && ar.Method != "POST" {
 		ar.Endpoint += "/"
 	}

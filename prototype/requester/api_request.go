@@ -5,20 +5,20 @@ import (
 	"net/http"
 )
 
-type APIRequest struct {
+type apiRequest struct {
 	Method   string
 	Endpoint string
 	Payload  io.Reader
 	Headers  http.Header
 }
 
-func NewAPIRequest(method string, endpoint string, payload io.Reader) *APIRequest {
+func newApiRequest(method string, endpoint string, payload io.Reader) *apiRequest {
 	var headers = http.Header{}
-	ar := &APIRequest{method, endpoint, payload, headers}
+	ar := &apiRequest{method, endpoint, payload, headers}
 	return ar
 }
 
-func (ar *APIRequest) SetHeader(key string, value string) *APIRequest {
+func (ar *apiRequest) SetHeader(key string, value string) *apiRequest {
 	ar.Headers.Set(key, value)
 	return ar
 }
