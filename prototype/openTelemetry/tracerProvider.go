@@ -42,13 +42,13 @@ func NewTracerProvider(cfg TracerConfig) (*tracerProvider, func(), error) {
 
 type TracerConfig struct {
 	ExporterData struct {
-		Kind string `json:"kind"`
-		Url  string `json:"url"`
-	} `json:"exporter_data"`
+		Kind string `json:"kind" mapstructure:"kind"`
+		Url  string `json:"url" mapstructure:"url"`
+	} `json:"exporter_data" mapstructure:"exporter_data"`
 	ResourceData struct {
-		ServiceName    string `json:"service_name"`
-		ServiceVersion string `json:"service_version"`
-	} `json:"resource_data"`
+		ServiceName    string `json:"service_name" mapstructure:"service_name"`
+		ServiceVersion string `json:"service_version" mapstructure:"service_version"`
+	} `json:"resource_data" mapstructure:"resource_data"`
 }
 
 // 定义Jaeger导出器
