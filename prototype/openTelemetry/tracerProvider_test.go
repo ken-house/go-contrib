@@ -1,0 +1,35 @@
+package openTelemetry
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestGetTracer(t *testing.T) {
+	cfg := TracerConfig{
+		ExporterData: struct {
+			Kind string `json:"kind"`
+			Url  string `json:"url"`
+		}{
+			Kind: "jaeger",
+			Url:  "http://10.0.98.16:14268/api/traces",
+		},
+		ResourceData: struct {
+			ServiceName    string `json:"service_name"`
+			ServiceVersion string `json:"service_version"`
+		}{
+			ServiceName:    "go_example",
+			ServiceVersion: "4.0.0",
+		},
+	}
+	tp, clean, err := NewTracerProvider(cfg)
+	if err != nil {
+		assert.Fail(t, "错误："+err.Error())
+	}
+	defer clean()
+	tracer := tp.GetTracer("go_example_tracer")
+	fmt.Println(tracer)
+	assert.True(t, true, "验证成功")
+}
