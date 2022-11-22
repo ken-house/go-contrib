@@ -157,13 +157,13 @@ func (r *requestClient) Do(ctx context.Context, ar *apiRequest, responseStruct i
 		if err = writer.Close(); err != nil {
 			return nil, err
 		}
-		req, err = http.NewRequest(ar.Method, URL.String(), body)
+		req, err = http.NewRequestWithContext(ctx, ar.Method, URL.String(), body)
 		if err != nil {
 			return nil, err
 		}
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 	} else {
-		req, err = http.NewRequest(ar.Method, URL.String(), ar.Payload)
+		req, err = http.NewRequestWithContext(ctx, ar.Method, URL.String(), ar.Payload)
 		if err != nil {
 			return nil, err
 		}
