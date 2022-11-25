@@ -16,6 +16,7 @@ import (
 
 type MeterProvider interface {
 	GetMeter(meterName string) metric.Meter
+	MeterPrometheusForGin(router *gin.Engine)
 }
 
 type meterProvider struct {
