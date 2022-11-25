@@ -4,6 +4,10 @@ import (
 	"context"
 	"log"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/gin-gonic/gin"
+
 	"go.opentelemetry.io/otel/metric"
 
 	"go.opentelemetry.io/otel/exporters/prometheus"
@@ -65,4 +69,9 @@ func initMeterProvider(cfg MeterConfig) (*sdkMetric.MeterProvider, error) {
 // GetMeter 创建一个指标监控对象
 func (mp *meterProvider) GetMeter(meterName string) metric.Meter {
 	return mp.Meter(meterName)
+}
+
+// MeterPrometheusForGin 为Gin接入Prometheus
+func (mp *meterProvider) MeterPrometheusForGin(router *gin.Engine) {
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 }
