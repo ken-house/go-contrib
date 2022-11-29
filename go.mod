@@ -13,6 +13,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/hashicorp/consul/api v1.3.0
+	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.2
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20221118010501-c1dc60d7d387
 	github.com/nacos-group/nacos-sdk-go/v2 v2.1.0
@@ -79,7 +80,6 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.3 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
-	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
