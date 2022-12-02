@@ -8,9 +8,9 @@ import (
 func InitSentry(cfg SentryConfig) error {
 	err := sentry.Init(
 		sentry.ClientOptions{
-			Dsn:   cfg.Dsn,
-			Debug: !env.IsReleasing(), // 线上环境为false 其他环境为true
-			//Transport:        sentry.NewHTTPSyncTransport(), // 同步发送到sentry
+			Dsn:              cfg.Dsn,
+			Debug:            !env.IsReleasing(),            // 线上环境为false 其他环境为true
+			Transport:        sentry.NewHTTPSyncTransport(), // 同步发送到sentry
 			SampleRate:       cfg.SampleRate,
 			TracesSampleRate: cfg.TracesSampleRate,
 			AttachStacktrace: cfg.AttachStacktrace,
