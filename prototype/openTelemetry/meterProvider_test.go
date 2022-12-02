@@ -25,10 +25,10 @@ func TestMeterProvider_GetMeter(t *testing.T) {
 
 	mp, clean, err := NewMeterProvider(cfg)
 	if err != nil {
-		assert.Fail(t, "错误："+err.Error())
+		assert.Error(t, err, nil)
 	}
 	defer clean()
 	meter := mp.GetMeter("go_example_meter")
 	fmt.Println(meter)
-	assert.True(t, true, "验证成功")
+	assert.Error(t, err, nil)
 }

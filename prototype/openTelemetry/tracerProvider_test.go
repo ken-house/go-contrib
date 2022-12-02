@@ -32,10 +32,10 @@ func TestGetTracer(t *testing.T) {
 	}
 	tp, clean, err := NewTracerProvider(cfg)
 	if err != nil {
-		assert.Fail(t, "错误："+err.Error())
+		assert.Error(t, err, nil)
 	}
 	defer clean()
 	tracer := tp.GetTracer("go_example_tracer")
 	fmt.Println(tracer)
-	assert.True(t, true, "验证成功")
+	assert.Error(t, err, nil)
 }
