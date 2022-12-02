@@ -20,7 +20,13 @@ func main() {
 	}))
 
 	app.GET("/foo", func(ctx *gin.Context) {
+		// painc捕获
 		panic("y tho222")
+
+		// 自定义错误捕获
+		if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
+			hub.CaptureMessage("自定义错误捕获")
+		}
 	})
 
 	_ = app.Run(":3000")

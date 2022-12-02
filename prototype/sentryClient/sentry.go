@@ -2,6 +2,8 @@ package sentryClient
 
 import (
 	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-gonic/gin"
 	"github.com/ken-house/go-contrib/utils/env"
 )
 
@@ -30,4 +32,18 @@ type SentryConfig struct {
 	AttachStacktrace bool     `json:"attach_stacktrace" mapstructure:"attach_stacktrace"`
 	TracesSampleRate float64  `json:"traces_sample_rate" mapstructure:"traces_sample_rate"`
 	IgnoreErrors     []string `json:"ignore_errors" mapstructure:"ignore_errors"`
+}
+
+// CustomCaptureExceptionSentryGin Gin捕获自定义错误
+func CustomCaptureExceptionSentryGin(ctx *gin.Context, err error) {
+	if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
+		hub.CaptureException(err)
+	}
+}
+
+// CustomCaptureMessageSentryGin Gin捕获自定义信息
+func CustomCaptureMessageSentryGin(ctx *gin.Context, message string) {
+	if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
+		hub.CaptureMessage(message)
+	}
 }
