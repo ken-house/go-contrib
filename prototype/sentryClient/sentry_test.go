@@ -4,8 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/getsentry/sentry-go"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,14 +17,15 @@ func TestInitSentry(t *testing.T) {
 		IgnoreErrors:     nil,
 	}
 
-	err := InitSentry(cfg)
+	client, clean, err := NewSentryClient(cfg)
 	if err != nil {
 		assert.False(t, false, "创建sentry对象失败")
 	}
+	defer clean()
 
 	_, err = os.Open("a.txt")
 	if err != nil {
-		sentry.CaptureException(err)
+		client.CaptureException(err)
 	}
 	assert.True(t, true)
 }

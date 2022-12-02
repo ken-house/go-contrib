@@ -1,32 +1,36 @@
 package main
 
 import (
-	"github.com/getsentry/sentry-go"
-	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
+	"github.com/ken-house/go-contrib/prototype/sentryClient"
 )
 
 func main() {
-	_ = sentry.Init(sentry.ClientOptions{
+	cfg := sentryClient.SentryConfig{
 		Dsn:              "https://789e8b4d389e40c5994f6b09bd89d519@o435470.ingest.sentry.io/4504257001422848",
-		Debug:            true,
+		ServerName:       "go_example",
+		SampleRate:       1.0,
 		AttachStacktrace: true,
-	})
+		TracesSampleRate: 1.0,
+		IgnoreErrors:     nil,
+	}
+
+	client, clean, err := sentryClient.NewSentryClient(cfg)
+	if err != nil {
+		panic(err)
+	}
+	defer clean()
 
 	app := gin.Default()
 
-	app.Use(sentrygin.New(sentrygin.Options{
-		Repanic: true,
-	}))
+	app.Use(client.SentryMiddlewareForGin())
 
 	app.GET("/foo", func(ctx *gin.Context) {
 		// painc捕获
-		panic("y tho222")
+		//panic("y tho222")
 
 		// 自定义错误捕获
-		if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
-			hub.CaptureMessage("自定义错误捕获")
-		}
+		client.CaptureMessage("自定义错误捕获")
 	})
 
 	_ = app.Run(":3000")
