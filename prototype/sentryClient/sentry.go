@@ -41,7 +41,7 @@ func CustomCaptureExceptionSentryGin(ctx *gin.Context, err error) {
 	}
 }
 
-// CustomCaptureMessageSentryGin Gin捕获自定义信息
+// CustomCaptureMessageSentryGin  Gin捕获自定义信息
 func CustomCaptureMessageSentryGin(ctx *gin.Context, message string) {
 	if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
 		hub.CaptureMessage(message)
