@@ -59,9 +59,10 @@ func TestRequestClient(t *testing.T) {
 	response, err := httpClient.Get(context, "/test", &responseData, nil)
 	if err != nil {
 		zap.L().Error("请求失败", zap.Error(err))
-		assert.Error(t, err, nil)
+		assert.Fail(t, err.Error())
+		return
 	}
 	fmt.Println(response)
 	fmt.Printf("responseData：%+v\n", responseData)
-	assert.Error(t, err, nil)
+	assert.Equal(t, err, nil)
 }

@@ -20,6 +20,7 @@ func TestInitSentry(t *testing.T) {
 	client, clean, err := NewSentryClient(cfg)
 	if err != nil {
 		assert.Fail(t, err.Error())
+		return
 	}
 	defer clean()
 
@@ -27,5 +28,5 @@ func TestInitSentry(t *testing.T) {
 	if err != nil {
 		client.CaptureException(err)
 	}
-	assert.Error(t, err, nil)
+	assert.Equal(t, err, nil)
 }

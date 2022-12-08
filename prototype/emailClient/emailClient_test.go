@@ -17,6 +17,7 @@ func TestEmailClient_Send(t *testing.T) {
 	emailClient, _, err := NewEmailClient(emailConf)
 	if err != nil {
 		assert.Fail(t, err.Error())
+		return
 	}
 	userList := []EmailUser{
 		{
@@ -37,8 +38,9 @@ func TestEmailClient_Send(t *testing.T) {
 	err = emailClient.Send(userList, message)
 	if err != nil {
 		assert.Fail(t, err.Error())
+		return
 	}
-	assert.Error(t, err, nil)
+	assert.Equal(t, err, nil)
 }
 
 func TestEmailClient_SendSpecial(t *testing.T) {
@@ -52,6 +54,7 @@ func TestEmailClient_SendSpecial(t *testing.T) {
 	emailClient, _, err := NewEmailClient(emailConf)
 	if err != nil {
 		assert.Fail(t, err.Error())
+		return
 	}
 	userList := []EmailUser{
 		{
@@ -85,6 +88,7 @@ func TestEmailClient_SendSpecial(t *testing.T) {
 	err = emailClient.SendSpecial(userList)
 	if err != nil {
 		assert.Fail(t, err.Error())
+		return
 	}
-	assert.Error(t, err, nil)
+	assert.Equal(t, err, nil)
 }
