@@ -79,7 +79,7 @@ func FileNotExistAndCreate(filePath string) (f *os.File, err error) {
 }
 
 // GenerateRandStr 随机产生指定长度字符串
-// flag指定类型 0 所有字符 1 全数字 2 全字母 3 数字+字母
+// flag指定类型 0 所有字符 1 全数字  2 全字母 3 数字+字母
 func GenerateRandStr(length int, flag int) string {
 	arr := make([]string, 0, 16)
 	rand.Seed(time.Now().UnixNano())
